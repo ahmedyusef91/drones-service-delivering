@@ -17,5 +17,11 @@ public interface DroneRepository extends JpaRepository<Drone, String> {
 	List<Drone> findAllByState(State state);
 
 	Drone findBySerialNumber(String serialNumber);
+	
+	default void updateState(Drone drone, State state) {
+		drone.setState(state);
+		this.save(drone);
+	}
+
 
 }
