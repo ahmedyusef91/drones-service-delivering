@@ -39,26 +39,25 @@ public class DroneServiceImpl implements DroneService {
 	}
 
 	@Override
-	public DroneMedicationLoad loadingDroneWithMedicationItem(String droneSerialNumber, String medicationCode,
-			String source, String destination) {
+	public DroneMedicationLoad loadingDroneWithMedicationItem(DroneMedicationLoad dronMedicatioLoad) {
 
-		Drone drone = droneRepository.findBySerialNumber(droneSerialNumber);
-		Medication medication = medicationRepository.findByCode(medicationCode);
+		Drone drone = droneRepository.findBySerialNumber(dronMedicatioLoad.getSerialNumber());
+		Medication medication = medicationRepository.findByCode(dronMedicatioLoad.getCode());
 
 		if (drone == null) {
-			throw new BusinessException("validation.drone.notFound", new Object[] { droneSerialNumber });
+			throw new BusinessException("validation.drone.notFound", new Object[] { dronMedicatioLoad.getSerialNumber() });
 		}
 
 		if (medication == null) {
-			throw new BusinessException("validation.medication.notexist", new Object[] { medicationCode });
+			throw new BusinessException("validation.medication.notexist", new Object[] { dronMedicatioLoad.getCode() });
 		}
 
 		DroneMedicationLoad droneMedicationLoad = new DroneMedicationLoad();
-		droneMedicationLoad.setSerialNumber(droneSerialNumber);
-		droneMedicationLoad.setCode(medicationCode);
+		droneMedicationLoad.setSerialNumber(dronMedicatioLoad.getSerialNumber());
+		droneMedicationLoad.setCode(dronMedicatioLoad.getCode());
 		droneMedicationLoad.setCreationDate(LocalDateTime.now());
-		droneMedicationLoad.setSource(source);
-		droneMedicationLoad.setDestination(destination);
+		droneMedicationLoad.setSource(dronMedicatioLoad.getSource());
+		droneMedicationLoad.setDestination(dronMedicatioLoad.getDestination());
 		droneLoadMedicationRepository.save(droneMedicationLoad);
 
 		this.droneRepository.updateState(drone, State.LOADING);

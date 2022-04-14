@@ -18,8 +18,7 @@ public interface DroneService {
 	Drone registerDrone(Drone drone);
 
 	// loading a drone with modification item
-	DroneMedicationLoad loadingDroneWithMedicationItem(String droneSerialNumber, String medicationCode,
-			String source, String destination);
+	DroneMedicationLoad loadingDroneWithMedicationItem(DroneMedicationLoad dronMedicatioLoad);
 
 	// check loaded modification items for given drones
 	boolean checkLoadedMedicationItem(String droneSerialNumber) throws BusinessException;
