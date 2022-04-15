@@ -2,6 +2,7 @@ package com.musalasoft.dronesServiceDelivering.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
 import com.musalasoft.dronesServiceDelivering.model.entity.DroneMedicationLoad;
@@ -28,5 +29,7 @@ public interface DroneService {
 
 	// check drone battery level for a given drone
 	BigDecimal checkBatteryLevelForGivenDrone(String droneSerialNumber) throws BusinessException;
+	//findBySerialNumber
+	Optional<Drone> findBySerialNumber(String serialNumber);
 
 }

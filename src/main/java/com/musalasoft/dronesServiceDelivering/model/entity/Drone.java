@@ -2,12 +2,21 @@ package com.musalasoft.dronesServiceDelivering.model.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
@@ -60,5 +69,27 @@ public class Drone implements Serializable {
 	@Enumerated
 	@Column(name = "STATE", nullable = false)
 	private State state;
+
+	@Column(name = "medications")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private List<Medication> medications;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_at")
+	private Date createdAt;
+
+	@Column(name = "updated_at")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updatedAt;
+
+	@PrePersist
+	private void setCreatedAt() {
+		createdAt = new Date();
+	}
+
+	@PreUpdate
+	private void setUpdatedAt() {
+		updatedAt = new Date();
+	}
 
 }

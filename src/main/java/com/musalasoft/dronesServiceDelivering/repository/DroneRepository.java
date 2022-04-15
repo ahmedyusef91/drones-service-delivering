@@ -1,6 +1,7 @@
 package com.musalasoft.dronesServiceDelivering.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,7 +17,7 @@ public interface DroneRepository extends JpaRepository<Drone, String> {
 
 	List<Drone> findAllByState(State state);
 
-	Drone findBySerialNumber(String serialNumber);
+	Optional<Drone> findBySerialNumber(String serialNumber);
 	
 	default void updateState(Drone drone, State state) {
 		drone.setState(state);

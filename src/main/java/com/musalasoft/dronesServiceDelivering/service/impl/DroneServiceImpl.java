@@ -3,6 +3,7 @@ package com.musalasoft.dronesServiceDelivering.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,11 +42,12 @@ public class DroneServiceImpl implements DroneService {
 	@Override
 	public DroneMedicationLoad loadingDroneWithMedicationItem(DroneMedicationLoad dronMedicatioLoad) {
 
-		Drone drone = droneRepository.findBySerialNumber(dronMedicatioLoad.getSerialNumber());
+		Optional<Drone> drone = droneRepository.findBySerialNumber(dronMedicatioLoad.getSerialNumber());
 		Medication medication = medicationRepository.findByCode(dronMedicatioLoad.getCode());
 
 		if (drone == null) {
-			throw new BusinessException("validation.drone.notFound", new Object[] { dronMedicatioLoad.getSerialNumber() });
+			throw new BusinessException("validation.drone.notFound",
+					new Object[] { dronMedicatioLoad.getSerialNumber() });
 		}
 
 		if (medication == null) {
@@ -60,14 +62,14 @@ public class DroneServiceImpl implements DroneService {
 		droneMedicationLoad.setDestination(dronMedicatioLoad.getDestination());
 		droneLoadMedicationRepository.save(droneMedicationLoad);
 
-		this.droneRepository.updateState(drone, State.LOADING);
+		this.droneRepository.updateState(drone.get(), State.LOADING);
 
 		return droneMedicationLoad;
 	}
 
 	@Override
 	public boolean checkLoadedMedicationItem(String droneSerialNumber) throws BusinessException {
-		Drone drone = droneRepository.findBySerialNumber(droneSerialNumber);
+		Optional<Drone> drone = droneRepository.findBySerialNumber(droneSerialNumber);
 		DroneMedicationLoad droneMedicationLoad = droneLoadMedicationRepository.findBySerialNumber(droneSerialNumber);
 		if (drone == null) {
 			throw new BusinessException("validation.drone.notFound", new Object[] { droneSerialNumber });
@@ -83,12 +85,12 @@ public class DroneServiceImpl implements DroneService {
 			throw new BusinessException("validation.medication.notexist", null);
 		}
 
-		if (drone.getWeightLimit() <= medication.getWeight()) {
+		if (drone.get().getWeightLimit() <= medication.getWeight()) {
 			droneLoadMedicationRepository.delete(droneMedicationLoad);
 			throw new BusinessException("validation.drone.exceedLimit",
-					new Object[] { droneSerialNumber, drone.getWeightLimit() });
+					new Object[] { droneSerialNumber, drone.get().getWeightLimit() });
 		}
-		if (drone.getBatteryCapacity().compareTo(BigDecimal.valueOf(0.25)) < 0) {
+		if (drone.get().getBatteryCapacity().compareTo(BigDecimal.valueOf(0.25)) < 0) {
 			droneLoadMedicationRepository.delete(droneMedicationLoad);
 			throw new BusinessException("validation.drone.batteryLow", new Object[] { droneSerialNumber });
 		}
@@ -103,7 +105,7 @@ public class DroneServiceImpl implements DroneService {
 			throw new BusinessException("validation.droneMedicationLoad.destination.notNull", null);
 		}
 
-		this.droneRepository.updateState(drone, State.LOADED);
+		this.droneRepository.updateState(drone.get(), State.LOADED);
 
 		return true;
 	}
@@ -115,13 +117,18 @@ public class DroneServiceImpl implements DroneService {
 
 	@Override
 	public BigDecimal checkBatteryLevelForGivenDrone(String droneSerialNumber) throws BusinessException {
-		Drone drone = droneRepository.findBySerialNumber(droneSerialNumber);
+		Optional<Drone> drone = droneRepository.findBySerialNumber(droneSerialNumber);
 		if (drone == null) {
 			throw new BusinessException("validation.drone.notfound", new Object[] { droneSerialNumber });
 		}
-		BigDecimal batteryLevel = drone.getBatteryCapacity();
+		BigDecimal batteryLevel = drone.get().getBatteryCapacity();
 
 		return batteryLevel;
+	}
+
+	@Override
+	public Optional<Drone> findBySerialNumber(String number) {
+		return droneRepository.findBySerialNumber(number);
 	}
 
 }

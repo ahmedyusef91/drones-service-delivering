@@ -1,29 +1,8 @@
- CREATE TABLE DRONES
-	(
-		SERIAL_NUMBER  VARCHAR(100) NOT NULL,
-		MODEL VARCHAR(50) NOT NULL,
-		WEIGHT_LIMIT INTEGER  NOT NULL,
-		BATTERY_CAPACITY INTEGER NOT NULL,
-		STATE VARCHAR(50) NOT NULL,
-		PRIMARY KEY(SERIAL_NUMBER)
-	);
-	
- CREATE TABLE MEDICATION
-        (
-        NAME  VARCHAR(100) NOT NULL,
-        WEIGHT INTEGER  NOT NULL,
-        CODE VARCHAR(100) NOT NULL,
-        IMAGE BINARY LARGE OBJECT ,
-        PRIMARY KEY(CODE)
-     );
-
- CREATE TABLE DRONE_MEDICATION_LOAD
-        (
-        LOAD_ID INTEGER  NOT NULL,
-        SOURCE VARCHAR(100) NOT NULL,
-		DESTINATION VARCHAR(100) NOT NULL,
-		CREATION_DATE DATE NOT NULL,
-		DRONE_SERIAL_NUMBER_FK VARCHAR(100) NOT NULL,
-		MEDICATION_CODE_FK VARCHAR(100) NOT NULL,
-        PRIMARY KEY(LOAD_ID)
-        );
+INSERT INTO ms_drone (serial_number, weight_limit, battery_capacity, model, state,
+created_at, updated_at) VALUES ('000-000', '500', '100', 'HEAVYWEIGHT', 'IDLE', null, null);
+INSERT INTO ms_drone (serial_number, weight_limit, battery_capacity, model, state,
+created_at, updated_at) VALUES ('000-001', '200', '100', 'LIGHTWEIGHT', 'IDLE', null, null);
+INSERT INTO ms_drone (serial_number, weight_limit, battery_capacity, model, state,
+created_at, updated_at) VALUES ('000-002', '400', '100', 'HEAVYWEIGHT', 'IDLE', null, null);
+INSERT INTO ms_drone (serial_number, weight_limit, battery_capacity, model, state,
+created_at, updated_at) VALUES ('000-003', '300', '100', 'LIGHTWEIGHT', 'IDLE', null, null);
