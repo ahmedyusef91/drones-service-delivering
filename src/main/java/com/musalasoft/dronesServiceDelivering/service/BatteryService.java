@@ -1,10 +1,12 @@
 package com.musalasoft.dronesServiceDelivering.service;
 
+import java.math.BigDecimal;
+
 /**
  * @author Ahmed.Yusef
  *
  * @Date Apr 15, 2022 5:49:02 PM
  */
 public interface BatteryService {
-	Double	 checkBatteryLevel(String serialNumber);
+	BigDecimal checkBatteryLevel(String serialNumber);
 }

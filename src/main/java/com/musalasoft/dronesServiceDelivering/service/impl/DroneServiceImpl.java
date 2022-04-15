@@ -131,4 +131,9 @@ public class DroneServiceImpl implements DroneService {
 		return droneRepository.findBySerialNumber(number);
 	}
 
+	@Override
+	public List<Drone> findAll() {
+		return (List<Drone>) droneRepository.findAll();
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.musalasoft.dronesServiceDelivering.model.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -31,12 +32,12 @@ public class AuditLog implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name = "serial_number", length=100, nullable = false)
+	@Column(name = "serial_number", length = 100, nullable = false)
 	private String serialNumber;
-	@Column(name = "drone_battery_level", length=100, nullable = false)
-	private Integer droneBatteryLevel;
+	@Column(name = "drone_battery_level", length = 100, nullable = false)
+	private BigDecimal droneBatteryLevel;
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="created_at")
+	@Column(name = "created_at")
 	private Date createdAt;
 
 	@PrePersist

@@ -31,5 +31,7 @@ public interface DroneService {
 	BigDecimal checkBatteryLevelForGivenDrone(String droneSerialNumber) throws BusinessException;
 	//findBySerialNumber
 	Optional<Drone> findBySerialNumber(String serialNumber);
+	
+	List<Drone> findAll();
 
 }
