@@ -1,6 +1,5 @@
 package com.musalasoft.dronesServiceDelivering.service.impl;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ public class BatteryServiceImpl implements BatteryService {
 	private DroneService droneService;
 
 	@Override
-	public BigDecimal checkBatteryLevel(String serialNumber) {
+	public double checkBatteryLevel(String serialNumber) {
 		Drone droneInDb = droneService.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new BusinessException("Drone serial number not found", null));
 
@@ -32,6 +31,6 @@ public class BatteryServiceImpl implements BatteryService {
 		Double medicationSum = droneInDb.getMedications().size() == 0 ? 0
 				: itemWeights.stream().mapToDouble(Double::doubleValue).sum();
 
-		return new BigDecimal((droneInDb.getWeightLimit() - medicationSum) / 5);
+		return ((droneInDb.getWeightLimit() - medicationSum) / 5);
 	}
 }

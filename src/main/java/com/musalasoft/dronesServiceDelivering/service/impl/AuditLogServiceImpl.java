@@ -1,7 +1,5 @@
 package com.musalasoft.dronesServiceDelivering.service.impl;
 
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.AuditLog;
@@ -31,7 +29,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 	public void checkDroneBatteryLevel() {
 
 		droneService.findAll().forEach(m -> {
-			BigDecimal capacity = batteryService.checkBatteryLevel(m.getSerialNumber());
+			double capacity = batteryService.checkBatteryLevel(m.getSerialNumber());
 			AuditLog newAuditLog = new AuditLog();
 			newAuditLog.setDroneBatteryLevel(capacity);
 			newAuditLog.setSerialNumber(m.getSerialNumber());

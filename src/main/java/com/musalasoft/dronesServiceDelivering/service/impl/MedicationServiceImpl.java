@@ -1,6 +1,7 @@
 package com.musalasoft.dronesServiceDelivering.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,13 @@ public class MedicationServiceImpl implements MedicationService {
 		byte[] imagebytes = ImageUtil.processImage(file);
 		medication.setImage(imagebytes);
 		return this.medicationRepository.save(medication);
+	}
+
+	@Override
+	public List<Medication> checkLoadedMedicationItem(String name) {
+
+		List<Medication> medications = medicationRepository.findByName(name);
+		
+		return medications;
 	}
 }

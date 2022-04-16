@@ -1,12 +1,9 @@
 package com.musalasoft.dronesServiceDelivering.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
-import com.musalasoft.dronesServiceDelivering.model.entity.DroneMedicationLoad;
-import com.musalasoft.dronesServiceDelivering.model.exception.BusinessException;
 
 /**
  * @author Ahmed.Yusef
@@ -19,19 +16,14 @@ public interface DroneService {
 	Drone registerDrone(Drone drone);
 
 	// loading a drone with modification item
-	DroneMedicationLoad loadingDroneWithMedicationItem(DroneMedicationLoad dronMedicatioLoad);
-
-	// check loaded modification items for given drones
-	boolean checkLoadedMedicationItem(String droneSerialNumber) throws BusinessException;
+	Drone loadingDroneWithMedicationItem(Drone drone);
 
 	// check available drones for loading
 	List<Drone> checkAvailableDrones();
 
-	// check drone battery level for a given drone
-	BigDecimal checkBatteryLevelForGivenDrone(String droneSerialNumber) throws BusinessException;
-	//findBySerialNumber
+	// findBySerialNumber
 	Optional<Drone> findBySerialNumber(String serialNumber);
-	
+
 	List<Drone> findAll();
 
 }

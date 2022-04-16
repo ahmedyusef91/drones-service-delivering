@@ -1,5 +1,8 @@
 package com.musalasoft.dronesServiceDelivering.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
@@ -11,6 +14,8 @@ import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
  */
 public interface MedicationRepository extends JpaRepository<Medication, String> {
 
-	Medication findByCode(String code);
+	Optional<Medication> findByCode(String code);
+
+	List<Medication> findByName(String name);
 
 }

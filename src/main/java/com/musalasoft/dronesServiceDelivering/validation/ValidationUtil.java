@@ -6,11 +6,11 @@ package com.musalasoft.dronesServiceDelivering.validation;
  * @Date Apr 15, 2022 6:11:57 PM
  */
 public class ValidationUtil {
-	public static boolean validateDroneWeightLimit(int weight) {
+	public static boolean validateDroneWeightLimit(double weight) {
 		return (weight > 0) && (weight <= 500);
 	}
 
-	public static boolean validateDroneBatteryCapacity(int capacity) {
+	public static boolean validateDroneBatteryCapacity(double capacity) {
 		return (capacity >= 0) && (capacity <= 100);
 	}
 

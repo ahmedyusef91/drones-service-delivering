@@ -1,22 +1,19 @@
 package com.musalasoft.dronesServiceDelivering.service.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
-import com.musalasoft.dronesServiceDelivering.model.entity.DroneMedicationLoad;
 import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
 import com.musalasoft.dronesServiceDelivering.model.exception.BusinessException;
 import com.musalasoft.dronesServiceDelivering.model.type.State;
-import com.musalasoft.dronesServiceDelivering.repository.DroneMedicationLoadRepository;
 import com.musalasoft.dronesServiceDelivering.repository.DroneRepository;
-import com.musalasoft.dronesServiceDelivering.repository.MedicationRepository;
 import com.musalasoft.dronesServiceDelivering.service.DroneService;
+import com.musalasoft.dronesServiceDelivering.validation.ValidationUtil;
 
 /**
  * @author Ahmed.Yusef
@@ -28,102 +25,57 @@ public class DroneServiceImpl implements DroneService {
 
 	@Autowired
 	private DroneRepository droneRepository;
-	@Autowired
-	private MedicationRepository medicationRepository;
-	@Autowired
-	private DroneMedicationLoadRepository droneLoadMedicationRepository;
 
 	@Override
 	public Drone registerDrone(Drone drone) {
-		drone.setState(State.IDLE);
-		return droneRepository.save(drone);
+		if (!ValidationUtil.validateDroneBatteryCapacity(drone.getBatteryCapacity()))
+			throw new BusinessException("invalid drone battery capacity");
+
+		if (!ValidationUtil.validateDroneWeightLimit(drone.getWeightLimit()))
+			throw new BusinessException("invalid drone weight limit");
+
+		Drone droneInDb = findBySerialNumber(drone.getSerialNumber())
+				.orElseThrow(() -> new BusinessException("Drone serial number not found"));
+
+		if (!droneInDb.getState().equals(State.LOADING))
+			throw new BusinessException("Update drone state to Loading before loading any items");
+
+		Drone newDrone = Drone.builder().serialNumber(drone.getSerialNumber())
+				.batteryCapacity(drone.getBatteryCapacity()).model(drone.getModel()).state(drone.getState()).build();
+
+		return droneRepository.save(newDrone);
 	}
 
 	@Override
-	public DroneMedicationLoad loadingDroneWithMedicationItem(DroneMedicationLoad dronMedicatioLoad) {
+	public Drone loadingDroneWithMedicationItem(Drone drone) {
 
-		Optional<Drone> drone = droneRepository.findBySerialNumber(dronMedicatioLoad.getSerialNumber());
-		Medication medication = medicationRepository.findByCode(dronMedicatioLoad.getCode());
+		Drone dronedb = findBySerialNumber(drone.getSerialNumber()).orElseThrow(
+				() -> new BusinessException("Drone with serial number " + drone.getSerialNumber() + " not found"));
 
-		if (drone == null) {
-			throw new BusinessException("validation.drone.notFound",
-					new Object[] { dronMedicatioLoad.getSerialNumber() });
-		}
+		List<Double> itemWeights = drone.getMedications().stream().map(Medication::getWeight)
+				.collect(Collectors.toList());
 
-		if (medication == null) {
-			throw new BusinessException("validation.medication.notexist", new Object[] { dronMedicatioLoad.getCode() });
-		}
+		double allItemsWeightSum = itemWeights.stream().mapToDouble(Double::doubleValue).sum();
 
-		DroneMedicationLoad droneMedicationLoad = new DroneMedicationLoad();
-		droneMedicationLoad.setSerialNumber(dronMedicatioLoad.getSerialNumber());
-		droneMedicationLoad.setCode(dronMedicatioLoad.getCode());
-		droneMedicationLoad.setCreationDate(LocalDateTime.now());
-		droneMedicationLoad.setSource(dronMedicatioLoad.getSource());
-		droneMedicationLoad.setDestination(dronMedicatioLoad.getDestination());
-		droneLoadMedicationRepository.save(droneMedicationLoad);
+		if (allItemsWeightSum > dronedb.getWeightLimit())
+			throw new BusinessException("Medication weight exceeds drone limit");
 
-		this.droneRepository.updateState(drone.get(), State.LOADING);
+		List<Medication> medications = drone.getMedications().stream()
+				.map(m -> new Medication(m.getCode(), m.getName(), m.getWeight(), m.getImage()))
+				.collect(Collectors.toList());
 
-		return droneMedicationLoad;
-	}
+		if (allItemsWeightSum == dronedb.getWeightLimit())
+			dronedb.setState(State.LOADED);
 
-	@Override
-	public boolean checkLoadedMedicationItem(String droneSerialNumber) throws BusinessException {
-		Optional<Drone> drone = droneRepository.findBySerialNumber(droneSerialNumber);
-		DroneMedicationLoad droneMedicationLoad = droneLoadMedicationRepository.findBySerialNumber(droneSerialNumber);
-		if (drone == null) {
-			throw new BusinessException("validation.drone.notFound", new Object[] { droneSerialNumber });
-		}
+		dronedb.setMedications(medications);
+		Drone droneInDb = droneRepository.save(dronedb);
 
-		if (droneMedicationLoad == null) {
-			throw new BusinessException("validation.droneMedicationLoad.notloaded", new Object[] { droneSerialNumber });
-		}
-
-		Medication medication = medicationRepository.findByCode(droneMedicationLoad.getCode());
-
-		if (medication == null) {
-			throw new BusinessException("validation.medication.notexist", null);
-		}
-
-		if (drone.get().getWeightLimit() <= medication.getWeight()) {
-			droneLoadMedicationRepository.delete(droneMedicationLoad);
-			throw new BusinessException("validation.drone.exceedLimit",
-					new Object[] { droneSerialNumber, drone.get().getWeightLimit() });
-		}
-		if (drone.get().getBatteryCapacity().compareTo(BigDecimal.valueOf(0.25)) < 0) {
-			droneLoadMedicationRepository.delete(droneMedicationLoad);
-			throw new BusinessException("validation.drone.batteryLow", new Object[] { droneSerialNumber });
-		}
-
-		if (droneMedicationLoad.getSource() == null) {
-			droneLoadMedicationRepository.delete(droneMedicationLoad);
-			throw new BusinessException("validation.droneMedicationLoad.source.notNull", null);
-		}
-
-		if (droneMedicationLoad.getDestination() == null) {
-			droneLoadMedicationRepository.delete(droneMedicationLoad);
-			throw new BusinessException("validation.droneMedicationLoad.destination.notNull", null);
-		}
-
-		this.droneRepository.updateState(drone.get(), State.LOADED);
-
-		return true;
+		return droneInDb;
 	}
 
 	@Override
 	public List<Drone> checkAvailableDrones() {
 		return droneRepository.findAllByState(State.IDLE);
-	}
-
-	@Override
-	public BigDecimal checkBatteryLevelForGivenDrone(String droneSerialNumber) throws BusinessException {
-		Optional<Drone> drone = droneRepository.findBySerialNumber(droneSerialNumber);
-		if (drone == null) {
-			throw new BusinessException("validation.drone.notfound", new Object[] { droneSerialNumber });
-		}
-		BigDecimal batteryLevel = drone.get().getBatteryCapacity();
-
-		return batteryLevel;
 	}
 
 	@Override

@@ -21,4 +21,8 @@ public class BusinessException extends RuntimeException {
 		this.code = code;
 		this.params = params;
 	}
+	
+	public BusinessException(String code) {
+		this.code = code;
+	}
 }

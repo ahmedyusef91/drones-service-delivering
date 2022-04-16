@@ -1,7 +1,6 @@
 package com.musalasoft.dronesServiceDelivering.model.entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import com.musalasoft.dronesServiceDelivering.model.type.Model;
 import com.musalasoft.dronesServiceDelivering.model.type.State;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -41,6 +41,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "DRONES")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Drone implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -59,12 +60,12 @@ public class Drone implements Serializable {
 	@DecimalMin(value = "0.0", inclusive = true, message = "{constraints.drone.weight.min}")
 	@DecimalMax(value = "500.0", inclusive = true, message = "{constraints.drone.weight.max}")
 	@Column(name = "WEIGHT_LIMIT", nullable = false)
-	private Double weightLimit;
+	private double weightLimit;
 
 	@NotNull(message = "{constraints.drone.batteryCapacity.notnull}")
 	@Range(min = 0, max = 100, message = "{constraints.drone.batteryCapacity.range}")
 	@Column(name = "BATTERY_CAPACITY", nullable = false)
-	private BigDecimal batteryCapacity;
+	private double batteryCapacity;
 
 	@Enumerated
 	@Column(name = "STATE", nullable = false)
