@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
+
 import lombok.Data;
 
 /**
@@ -14,6 +16,6 @@ import lombok.Data;
 @Data
 public class LoadDroneRequest {
 	@NotNull(message = "Drone id is required")
-	private long droneId;
-	private List<MedicationRequest> items;
+	private String serialNumber;
+	private List<Medication> items;
 }

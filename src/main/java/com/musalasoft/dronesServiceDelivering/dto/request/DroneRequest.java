@@ -19,11 +19,11 @@ public class DroneRequest {
 	@NotNull(message = "Serial Number is required")
 	private String serialNumber;
 	@NotNull(message = "Weight is required")
-	private Integer weight;
+	private Double weightLimit;
 	@NotNull(message = "Battery Capacity is required")
-	private Integer batteryCapacity;
+	private Double batteryCapacity;
 	@NotNull(message = "Drone Model is required")
-	private Model droneModel;
+	private Model model;
 	@NotNull(message = "Drone State is required")
-	private State droneState;
+	private State state;
 }

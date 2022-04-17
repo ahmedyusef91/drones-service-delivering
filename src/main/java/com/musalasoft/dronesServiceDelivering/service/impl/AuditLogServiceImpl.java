@@ -1,6 +1,7 @@
 package com.musalasoft.dronesServiceDelivering.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.AuditLog;
 import com.musalasoft.dronesServiceDelivering.repository.AuditLogRepository;
@@ -13,6 +14,7 @@ import com.musalasoft.dronesServiceDelivering.service.DroneService;
  *
  * @Date Apr 15, 2022 5:41:06 PM
  */
+@Service
 public class AuditLogServiceImpl implements AuditLogService {
 
 	@Autowired

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
 import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
@@ -16,6 +17,7 @@ import com.musalasoft.dronesServiceDelivering.service.DroneService;
  *
  * @Date Apr 15, 2022 5:49:13 PM
  */
+@Service
 public class BatteryServiceImpl implements BatteryService {
 	@Autowired
 	private DroneService droneService;

@@ -3,6 +3,7 @@ package com.musalasoft.dronesServiceDelivering.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.musalasoft.dronesServiceDelivering.dto.request.LoadDroneRequest;
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
 
 /**
@@ -16,7 +17,7 @@ public interface DroneService {
 	Drone registerDrone(Drone drone);
 
 	// loading a drone with modification item
-	Drone loadingDroneWithMedicationItem(Drone drone);
+	Drone loadingDroneWithMedicationItem(LoadDroneRequest loadDroneRequest);
 
 	// check available drones for loading
 	List<Drone> checkAvailableDrones();
@@ -25,5 +26,7 @@ public interface DroneService {
 	Optional<Drone> findBySerialNumber(String serialNumber);
 
 	List<Drone> findAll();
+
+	Drone save(Drone drone);
 
 }

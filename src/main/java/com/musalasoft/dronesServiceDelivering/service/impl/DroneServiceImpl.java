@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.musalasoft.dronesServiceDelivering.dto.request.LoadDroneRequest;
 import com.musalasoft.dronesServiceDelivering.model.entity.Drone;
 import com.musalasoft.dronesServiceDelivering.model.entity.Medication;
 import com.musalasoft.dronesServiceDelivering.model.exception.BusinessException;
@@ -29,38 +30,38 @@ public class DroneServiceImpl implements DroneService {
 	@Override
 	public Drone registerDrone(Drone drone) {
 		if (!ValidationUtil.validateDroneBatteryCapacity(drone.getBatteryCapacity()))
-			throw new BusinessException("invalid drone battery capacity");
+			throw new BusinessException("validation.drone.batteryLow");
 
 		if (!ValidationUtil.validateDroneWeightLimit(drone.getWeightLimit()))
-			throw new BusinessException("invalid drone weight limit");
+			throw new BusinessException("validation.drone.invalidLimit");
 
-		Drone droneInDb = findBySerialNumber(drone.getSerialNumber())
-				.orElseThrow(() -> new BusinessException("Drone serial number not found"));
+		Drone droneInDb = findBySerialNumber(drone.getSerialNumber()).orElseThrow(
+				() -> new BusinessException("validation.drone.notfound", new Object[] { drone.getSerialNumber() }));
 
-		if (!droneInDb.getState().equals(State.LOADING))
-			throw new BusinessException("Update drone state to Loading before loading any items");
+		if (!drone.getState().equals(State.LOADING))
+			throw new BusinessException("validation.droneMedicationLoad.notloading");
 
-		Drone newDrone = Drone.builder().serialNumber(drone.getSerialNumber())
+		Drone newDrone = Drone.builder().serialNumber(drone.getSerialNumber()).weightLimit(drone.getWeightLimit())
 				.batteryCapacity(drone.getBatteryCapacity()).model(drone.getModel()).state(drone.getState()).build();
 
 		return droneRepository.save(newDrone);
 	}
 
 	@Override
-	public Drone loadingDroneWithMedicationItem(Drone drone) {
+	public Drone loadingDroneWithMedicationItem(LoadDroneRequest drone) {
 
 		Drone dronedb = findBySerialNumber(drone.getSerialNumber()).orElseThrow(
-				() -> new BusinessException("Drone with serial number " + drone.getSerialNumber() + " not found"));
+				() -> new BusinessException("validation.drone.notfound", new Object[] { drone.getSerialNumber() }));
 
-		List<Double> itemWeights = drone.getMedications().stream().map(Medication::getWeight)
-				.collect(Collectors.toList());
+		List<Double> itemWeights = drone.getItems().stream().map(Medication::getWeight).collect(Collectors.toList());
 
 		double allItemsWeightSum = itemWeights.stream().mapToDouble(Double::doubleValue).sum();
 
 		if (allItemsWeightSum > dronedb.getWeightLimit())
-			throw new BusinessException("Medication weight exceeds drone limit");
+			throw new BusinessException("validation.drone.exceedLimit",
+					new Object[] { drone.getSerialNumber(), dronedb.getWeightLimit() });
 
-		List<Medication> medications = drone.getMedications().stream()
+		List<Medication> medications = drone.getItems().stream()
 				.map(m -> new Medication(m.getCode(), m.getName(), m.getWeight(), m.getImage()))
 				.collect(Collectors.toList());
 
@@ -68,7 +69,7 @@ public class DroneServiceImpl implements DroneService {
 			dronedb.setState(State.LOADED);
 
 		dronedb.setMedications(medications);
-		Drone droneInDb = droneRepository.save(dronedb);
+		Drone droneInDb = save(dronedb);
 
 		return droneInDb;
 	}
@@ -86,6 +87,11 @@ public class DroneServiceImpl implements DroneService {
 	@Override
 	public List<Drone> findAll() {
 		return (List<Drone>) droneRepository.findAll();
+	}
+
+	@Override
+	public Drone save(Drone drone) {
+		return droneRepository.save(drone);
 	}
 
 }
