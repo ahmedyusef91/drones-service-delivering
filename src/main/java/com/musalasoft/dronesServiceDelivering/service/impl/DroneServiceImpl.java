@@ -35,8 +35,6 @@ public class DroneServiceImpl implements DroneService {
 		if (!ValidationUtil.validateDroneWeightLimit(drone.getWeightLimit()))
 			throw new BusinessException("validation.drone.invalidLimit");
 
-		Drone droneInDb = findBySerialNumber(drone.getSerialNumber()).orElseThrow(
-				() -> new BusinessException("validation.drone.notfound", new Object[] { drone.getSerialNumber() }));
 
 		if (!drone.getState().equals(State.LOADING))
 			throw new BusinessException("validation.droneMedicationLoad.notloading");
