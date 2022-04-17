@@ -30,7 +30,7 @@ public class DroneServiceImpl implements DroneService {
 	@Override
 	public Drone registerDrone(Drone drone) {
 		if (!ValidationUtil.validateDroneBatteryCapacity(drone.getBatteryCapacity()))
-			throw new BusinessException("validation.drone.batteryLow");
+			throw new BusinessException("validation.drone.batteryCapacity.invalid");
 
 		if (!ValidationUtil.validateDroneWeightLimit(drone.getWeightLimit()))
 			throw new BusinessException("validation.drone.invalidLimit");
@@ -40,7 +40,9 @@ public class DroneServiceImpl implements DroneService {
 
 		if (!drone.getState().equals(State.LOADING))
 			throw new BusinessException("validation.droneMedicationLoad.notloading");
-
+		if (drone.getBatteryCapacity() < 25) {
+			throw new BusinessException("validation.drone.batteryCapacity.low");
+		}
 		Drone newDrone = Drone.builder().serialNumber(drone.getSerialNumber()).weightLimit(drone.getWeightLimit())
 				.batteryCapacity(drone.getBatteryCapacity()).model(drone.getModel()).state(drone.getState()).build();
 
@@ -52,7 +54,6 @@ public class DroneServiceImpl implements DroneService {
 
 		Drone dronedb = findBySerialNumber(drone.getSerialNumber()).orElseThrow(
 				() -> new BusinessException("validation.drone.notfound", new Object[] { drone.getSerialNumber() }));
-
 		List<Double> itemWeights = drone.getItems().stream().map(Medication::getWeight).collect(Collectors.toList());
 
 		double allItemsWeightSum = itemWeights.stream().mapToDouble(Double::doubleValue).sum();
@@ -60,6 +61,10 @@ public class DroneServiceImpl implements DroneService {
 		if (allItemsWeightSum > dronedb.getWeightLimit())
 			throw new BusinessException("validation.drone.exceedLimit",
 					new Object[] { drone.getSerialNumber(), dronedb.getWeightLimit() });
+		if (dronedb.getBatteryCapacity() < 25) {
+			throw new BusinessException("validation.drone.batteryCapacity.low");
+		}
+		dronedb.setState(State.LOADING);
 
 		List<Medication> medications = drone.getItems().stream()
 				.map(m -> new Medication(m.getCode(), m.getName(), m.getWeight(), m.getImage()))

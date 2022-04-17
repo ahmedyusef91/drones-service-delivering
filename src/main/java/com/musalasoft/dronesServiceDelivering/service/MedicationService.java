@@ -17,5 +17,5 @@ public interface MedicationService {
 	Medication registerMedication(Medication medication, MultipartFile file) throws IOException;
 
 	// check loaded modification items for given drones
-	List<Medication> checkLoadedMedicationItem(String name);
+	List<Medication> checkLoadedMedicationItem(String droneSerialNumber);
 }

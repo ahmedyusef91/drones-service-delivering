@@ -17,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 public class AuditLogTask {
 	private final AuditLogService logService;
 
-	// @Scheduled(cron = "0 0 0 * * *") // midnight everyday
-	@Scheduled(fixedDelay = 5000)
+	@Scheduled(cron = "${droneBatteryLevelTiming}")
 	public void logBatteryCapacity() {
 
 		System.out.println("running audit log");
 		logService.checkDroneBatteryLevel();
 
 	}
+
 }

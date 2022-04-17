@@ -35,7 +35,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 			AuditLog newAuditLog = new AuditLog();
 			newAuditLog.setDroneBatteryLevel(capacity);
 			newAuditLog.setSerialNumber(m.getSerialNumber());
-
+			System.out.println("Serial Number:   " + m.getSerialNumber() + "      battery capacity     " + m.getBatteryCapacity());
 			save(newAuditLog);
 		});
 	}
